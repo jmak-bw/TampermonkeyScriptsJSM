@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         [Netsuite] Task Page Shortcuts
 // @namespace    http://tampermonkey.net/
-// @version      4.4
+// @version      4.5
 // @description  Adds shortcuts to Netsuite task pages.
 // @author       JSM
 // @match        https://*.netsuite.com/app/crm/calendar/task.nl?l=T&*
@@ -41,9 +41,9 @@
         "Credit Note": {message: "Hi Wendy,\n\nCan you raise a credit note for this order, please? I will give you the signed form.\n\nThank you.", title: " – Credit Note", priority: "Medium" }
     };
     const purchaseMessages = {
-        "No stock": { message: "Hi Matt,\n\nCould you please raise an order for more off [PT No.]? There's none left in stock.\n\nThank you!", title: " – PO to be raise – None left in stock", priority: "Medium" },
+        "No stock": { message: "Hi Matt,\n\nCould you please raise an order for more off [PT No.]? There's none left in stock.\n\nThank you!", title: " – PO to be raised – None left in stock", priority: "Medium" },
         PO: { message: "Hi Matt,\n\nCould you please raise a PO for the below item(s) please?\n\n\n\nThank you!", title: " – PO to be raised", priority: "High" },
-        "Pt No. + PO": { message: "Hi Matt,\n\nCan you please raise a new part number and PO for the items below please?\n\n[PT No.]\n\nThank you!", title: " – Part no. + PO to be raise – PDR items", priority: "Medium" },
+        "Pt No. + PO": { message: "Hi Matt,\n\nCan you please raise a new part number and PO for the items below please?\n\n[PT No.]\n\nThank you!", title: " – Part no. + PO to be raised – PDR items", priority: "Medium" },
         ETA: { message: "Hi Matt,\n\nWould you be able to provide an ETA for the below items please?\nThe client is chasing us. \n\n\n\n\nThank you!", title: " – ETA delivery", priority: "High" }
 
     };
