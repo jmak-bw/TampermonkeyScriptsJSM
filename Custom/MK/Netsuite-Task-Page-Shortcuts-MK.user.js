@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         [Netsuite] Task Page Shortcuts (MK)
 // @namespace    http://tampermonkey.net/
-// @version      4.4.2
+// @version      4.4.3
 // @description  Adds shortcuts to Netsuite task pages. Custom script for MK.
 // @author       JSM
 // @match        https://*.netsuite.com/app/crm/calendar/task.nl?l=T&*
 // @match        https://7142405.app.netsuite.com/app/crm/calendar/task.nl?id=*
 // @grant        GM_addStyle
-// @run-at       document-idle
+// @run-at       document-start
 // @updateURL    https://raw.githubusercontent.com/jmak-bw/TampermonkeyScriptsJSM/main/Custom/MK/Netsuite-Task-Page-Shortcuts-MK.user.js
 // @downloadURL  https://raw.githubusercontent.com/jmak-bw/TampermonkeyScriptsJSM/main/Custom/MK/Netsuite-Task-Page-Shortcuts-MK.user.js
 // ==/UserScript==
