@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         [Netsuite] Task Page Shortcuts (MK)
 // @namespace    http://tampermonkey.net/
-// @version      4.4.3
+// @version      4.4.4
 // @description  Adds shortcuts to Netsuite task pages. Custom script for MK.
 // @author       JSM
 // @match        https://*.netsuite.com/app/crm/calendar/task.nl?l=T&*
 // @match        https://7142405.app.netsuite.com/app/crm/calendar/task.nl?id=*
 // @grant        GM_addStyle
-// @run-at       document-start
+// @run-at       document-body
 // @updateURL    https://raw.githubusercontent.com/jmak-bw/TampermonkeyScriptsJSM/main/Custom/MK/Netsuite-Task-Page-Shortcuts-MK.user.js
 // @downloadURL  https://raw.githubusercontent.com/jmak-bw/TampermonkeyScriptsJSM/main/Custom/MK/Netsuite-Task-Page-Shortcuts-MK.user.js
 // ==/UserScript==
@@ -179,8 +179,8 @@
         let button = document.createElement("button");
         button.innerText = "Fill";
         button.style.position = "absolute";
-        button.style.top = "203px";
-        button.style.left = "295px";
+        button.style.top = "207px";
+        button.style.left = "315px";
         button.style.zIndex = "9999"; // Ensure it stays on top
         button.style.background = "#007bff";
         button.style.color = "white";
@@ -346,7 +346,7 @@
             const updateButton = document.createElement('button');
             updateButton.innerHTML = 'Update';  // Break the text into two lines using <br>
             updateButton.style.position = 'absolute';
-            updateButton.style.top = '482px';
+            updateButton.style.top = '487px';
             updateButton.style.left = '320px';
             updateButton.style.padding = '5px 10px';  // Smaller padding for a smaller button
             updateButton.style.backgroundColor = '#ffa600';
