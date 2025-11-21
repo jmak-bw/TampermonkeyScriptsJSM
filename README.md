@@ -1,3 +1,6 @@
+Tampermonkey download: https://www.tampermonkey.net/
+Compatible with Chrome, Microsoft Edge, Firefox, Safari, and Opera Next.
+
 If you would like certain things changed in the scripts, such as messages, additional buttons, etc... Please do let me know!
 
 For custom scripts, please see folder "Custom".
