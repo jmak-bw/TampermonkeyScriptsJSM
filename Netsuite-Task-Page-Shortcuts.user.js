@@ -8,8 +8,8 @@
 // @match        https://7142405.app.netsuite.com/app/crm/calendar/task.nl?id=*
 // @grant        GM_addStyle
 // @run-at       document-idle
-// @updateURL    https://raw.githubusercontent.com/jmak-bw/TampermonkeyScriptsJSM/main/Netsuite-Task-Page-Shortcuts.user.js
-// @downloadURL  https://raw.githubusercontent.com/jmak-bw/TampermonkeyScriptsJSM/main/Netsuite-Task-Page-Shortcuts.user.js
+// @updateURL    https://raw.githubusercontent.com/jmak-bw/TampermonkeyScriptsJSM/main/Netsuite/Netsuite-Task-Page-Shortcuts.user.js
+// @downloadURL  https://raw.githubusercontent.com/jmak-bw/TampermonkeyScriptsJSM/main/Netsuite/Netsuite-Task-Page-Shortcuts.user.js
 // ==/UserScript==
 
 (function() {
