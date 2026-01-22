@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         [Netsuite] Task Page Shortcuts
 // @namespace    http://tampermonkey.net/
-// @version      4.5.2
+// @version      4.6.0
 // @description  Adds shortcuts to Netsuite task pages.
 // @author       JSM
 // @match        https://*.netsuite.com/app/crm/calendar/task.nl?l=T&*
@@ -148,6 +148,16 @@
         }
     }
 
+    function extractItemTitle() {
+        const el = document.getElementById('relateditem_display');
+        if (el && el.value && el.value.trim()) {
+            itemTitle = el.value.trim();
+            console.log('extractItemTitle: Success →', itemTitle);
+        } else {
+            console.log('extractItemTitle: relateditem_display not ready');
+        }
+    }
+
     // Example of using the global SOID after extraction
     function logSOID() {
         console.log("Function logSOID: ", new Date());
@@ -164,7 +174,7 @@
         let titleInput = document.getElementById("title");
 
         if (titleInput) {
-            if (SOID) {
+            if (SOID && SOID.trim()) {
                 titleInput.value = SOID + " - ";
             } else if (itemTitle) {
                 titleInput.value = itemTitle + " - ";
@@ -331,6 +341,7 @@
         window.addEventListener("load", function() {
             // Extract SOID and SDate
             extractSOID();
+            extractItemTitle();
 
             // Create dropdowns for Dispatch and Invoice
             createDropdown("Dispatch", dispatchMessages, key => updateFields("dispatch", dispatchMessages[key]), "#FF5733");
@@ -667,3 +678,4 @@
 
     // Ensure that the script executes on page load
 })();
+
