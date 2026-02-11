@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         [Netsuite]Autofill Search Bar
+// @name         [Netsuite]Autofill Search Bar test
 // @namespace    http://tampermonkey.net/
-// @version      1.1.2
+// @version      1.1.3
 // @description  Autofills search box based buttons and resize search bar and role buttons (responsive absolute positioning)
 // @author       JSM
 // @match        https://*.app.netsuite.com/*
@@ -25,6 +25,7 @@
     let soButton;
     let invButton;
     let poButton;
+    let ifButton;
     let buttonWrapper;
     let searchInput;
 
@@ -47,7 +48,7 @@
 
     // Adjust the year in the input while preserving user input
     function adjustYear(input, delta) {
-        const pattern = /(SO|INV|PO)-BWUK-(\d{4})(-.*)?/;
+        const pattern = /(SO|INV|PO|IF)-BWUK-(\d{4})(-.*)?/;
         const match = input.value.match(pattern);
         if (match) {
             const prefix = match[1];
@@ -109,11 +110,15 @@
                 invButton.textContent = 'INV';
                 poButton = document.createElement('button');
                 poButton.textContent = 'PO';
+                ifButton = document.createElement('button');
+                ifButton.textContent = 'IF';
 
                 // Basic styling
-                [soButton, invButton, poButton].forEach(btn => {
+                [soButton, invButton, poButton, ifButton].forEach(btn => {
                     Object.assign(btn.style, {
                         padding: '7px',
+                        minWidth: '35px',
+                        textAlign: 'center',
                         border: '1px solid #ccc',
                         borderRadius: '3px',
                         cursor: 'pointer',
@@ -132,23 +137,36 @@
                 buttonWrapper.appendChild(soButton);
                 buttonWrapper.appendChild(invButton);
                 buttonWrapper.appendChild(poButton);
+                buttonWrapper.appendChild(ifButton);
 
                 stackPanel.appendChild(buttonWrapper);
                 setTimeout(positionButton, 550);
                 window.addEventListener('resize', positionButton);
+                function applyPrefix(prefix, input) {
+                    const year = getCurrentYear();
+                    const fullPattern = /^(SO|INV|PO|IF)-BWUK-(\d{4})-(.*)$/;
+                    const value = input.value.trim();
 
+                    if (fullPattern.test(value)) {
+                        input.value = value.replace(/^(SO|INV|PO|IF)-/, `${prefix}-`);
+                    } else if (value) {
+                        input.value = `${prefix}-BWUK-${year}-${value}`;
+                    } else {
+                        input.value = `${prefix}-BWUK-${year}-`;
+                    }
+
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+                    input.focus();
+
+                    setTimeout(() => {
+                        input.selectionStart = input.selectionEnd = input.value.length;
+                    }, 0);
+                }
                 // Add event listener for each main button
                 function setupMainButton(btn, prefix) {
                     btn.addEventListener('click', () => {
-                        const text = `${prefix}-BWUK-${getCurrentYear()}-`;
-                        searchInput.value = text;
-                        searchInput.dispatchEvent(new Event('input', { bubbles: true }));
-                        searchInput.dispatchEvent(new Event('change', { bubbles: true }));
-                        searchInput.focus();
-                        setTimeout(() => {
-                            searchInput.selectionStart = text.length;
-                            searchInput.selectionEnd = text.length;
-                        }, 0);
+                        applyPrefix(prefix, searchInput);
 
                         if (!document.getElementById('yearButtonsWrapper')) {
                             const yearWrapper = document.createElement('div');
@@ -164,6 +182,7 @@
                 setupMainButton(soButton, 'SO');
                 setupMainButton(invButton, 'INV');
                 setupMainButton(poButton, 'PO');
+                setupMainButton(ifButton, 'IF');
             } else {
                 console.error('Search input element not found.');
             }
