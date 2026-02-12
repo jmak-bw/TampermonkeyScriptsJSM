@@ -21,11 +21,24 @@
             let soText = soDiv.textContent.trim();
             let statusText = statusDiv.textContent.trim();
 
-            // Remove the unwanted part
-            soText = soText.replace(/-BWUK-\d{4}-/, '-');
+            let extractedYear = null;
+            let shortYear = null;
+
+            // Remove -BWUK-<year>- and extract year
+            soText = soText.replace(/-BWUK-(\d{4})-/, (match, year) => {
+                extractedYear = year;
+                shortYear = 'Y' + year.slice(-2);
+                return '-';
+            });
+
+            // Shorten status
+            statusText = statusText
+                .replace(/^Pending\s+/i, 'P. ')
+                .replace(/^Partially\s+/i, 'P. ')
+                .replace(/^Fully Billed$/i, 'Billed');
 
             // Set as page title
-            document.title = `${soText} - ${statusText}`;
+            document.title = `${soText} ${shortYear ? '(' + shortYear + ')' : ''} - ${statusText}`;
 
             clearInterval(interval); // Stop checking once found
         }
