@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         [Netsuite] Better Tab Titles
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      1.1
 // @description  Set custom title for Netsuite Sales Orders
 // @match        https://*.app.netsuite.com/app/accounting/transactions/*
 // @run-at       document-start
@@ -22,7 +22,7 @@
             let statusText = statusDiv.textContent.trim();
 
             // Remove the unwanted part
-            soText = soText.replace(/BWUK-2025-/, '');
+            soText = soText.replace(/-BWUK-\d{4}-/, '-');
 
             // Set as page title
             document.title = `${soText} - ${statusText}`;
