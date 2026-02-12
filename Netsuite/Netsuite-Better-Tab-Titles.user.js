@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         [Netsuite] Better Tab Titles
 // @namespace    http://tampermonkey.net/
-// @version      1.2
+// @version      2.0
 // @description  Set custom title for Netsuite Sales Orders
 // @match        https://*.app.netsuite.com/app/accounting/transactions/*
 // @run-at       document-start
@@ -16,11 +16,15 @@
     const interval = setInterval(() => {
         const soDiv = document.querySelector('div.uir-record-id');
         const statusDiv = document.querySelector('div.uir-record-status');
+        const typeDiv = document.querySelector('h1.uir-record-type');
+        const itemDiv = document.querySelector('div.uir-record-name');
 
+        let titleText = '';
+
+        // Case 1: soDiv + statusDiv exist
         if (soDiv && statusDiv) {
             let soText = soDiv.textContent.trim();
             let statusText = statusDiv.textContent.trim();
-
             let extractedYear = null;
             let shortYear = null;
 
@@ -37,10 +41,18 @@
                 .replace(/^Partially\s+/i, 'P. ')
                 .replace(/^Fully Billed$/i, 'Billed');
 
-            // Set as page title
-            document.title = `${soText} ${shortYear ? '(' + shortYear + ')' : ''} - ${statusText}`;
+            titleText = `${soText}${shortYear ? ' (' + shortYear + ')' : ''} - ${statusText}`;
 
-            clearInterval(interval); // Stop checking once found
+        // Case 2: fallback if soDiv or statusDiv missing
+        } else if (typeDiv && itemDiv) {
+            titleText = `${itemDiv.textContent} - ${typeDiv.textContent}`;
         }
-    }, 500); // Check every 500ms
+
+        // Set title if we got something
+        if (titleText) {
+            document.title = titleText;
+            clearInterval(interval);
+        }
+
+    }, 500);
 })();
