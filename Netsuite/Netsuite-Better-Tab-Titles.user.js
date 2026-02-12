@@ -1,9 +1,10 @@
 // ==UserScript==
 // @name         [Netsuite] Better Tab Titles
 // @namespace    http://tampermonkey.net/
-// @version      2.0
+// @version      2.1
 // @description  Set custom title for Netsuite Sales Orders
 // @match        https://*.app.netsuite.com/app/accounting/transactions/*
+// @match        https://*.app.netsuite.com/app/*
 // @run-at       document-start
 // @grant        none
 // @updateURL    https://raw.githubusercontent.com/jmak-bw/TampermonkeyScriptsJSM/main/Netsuite/Netsuite-Better-Tab-Titles.user.js
@@ -19,33 +20,40 @@
         const typeDiv = document.querySelector('h1.uir-record-type');
         const itemDiv = document.querySelector('div.uir-record-name');
 
+        // Only proceed if typeDiv exists
+        if (!typeDiv) return;
+
         let titleText = '';
 
-        // Case 1: soDiv + statusDiv exist
-        if (soDiv && statusDiv) {
-            let soText = soDiv.textContent.trim();
-            let statusText = statusDiv.textContent.trim();
-            let extractedYear = null;
-            let shortYear = null;
+        // Case 1: Inventory Item → show item + type
+        if (typeDiv.textContent.trim() === 'Inventory Item') {
+            if (itemDiv) {
+                titleText = `${itemDiv.textContent} - ${typeDiv.textContent}`;
+            }
 
-            // Remove -BWUK-<year>- and extract year
-            soText = soText.replace(/-BWUK-(\d{4})-/, (match, year) => {
-                extractedYear = year;
-                shortYear = 'Y' + year.slice(-2);
-                return '-';
-            });
+        // Case 2: Anything else → show SO/status logic
+        } else {
+            if (soDiv && statusDiv) {
+                let soText = soDiv.textContent.trim();
+                let statusText = statusDiv.textContent.trim();
+                let extractedYear = null;
+                let shortYear = null;
 
-            // Shorten status
-            statusText = statusText
-                .replace(/^Pending\s+/i, 'P. ')
-                .replace(/^Partially\s+/i, 'P. ')
-                .replace(/^Fully Billed$/i, 'Billed');
+                // Remove -BWUK-<year>- and extract year
+                soText = soText.replace(/-BWUK-(\d{4})-/, (match, year) => {
+                    extractedYear = year;
+                    shortYear = 'Y' + year.slice(-2);
+                    return '-';
+                });
 
-            titleText = `${soText}${shortYear ? ' (' + shortYear + ')' : ''} - ${statusText}`;
+                // Shorten status
+                statusText = statusText
+                    .replace(/^Pending\s+/i, 'P. ')
+                    .replace(/^Partially\s+/i, 'P. ')
+                    .replace(/^Fully Billed$/i, 'Billed');
 
-        // Case 2: fallback if soDiv or statusDiv missing
-        } else if (typeDiv && itemDiv) {
-            titleText = `${itemDiv.textContent} - ${typeDiv.textContent}`;
+                titleText = `${soText}${shortYear ? ' (' + shortYear + ')' : ''} - ${statusText}`;
+            }
         }
 
         // Set title if we got something
