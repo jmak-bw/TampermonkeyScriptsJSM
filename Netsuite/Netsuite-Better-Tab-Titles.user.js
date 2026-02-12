@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         [Netsuite] Better Tab Titles
 // @namespace    http://tampermonkey.net/
-// @version      1.1
+// @version      1.2
 // @description  Set custom title for Netsuite Sales Orders
 // @match        https://*.app.netsuite.com/app/accounting/transactions/*
 // @run-at       document-start
