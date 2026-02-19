@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         [Netsuite] Task Page Shortcuts
 // @namespace    http://tampermonkey.net/
-// @version      4.6.1
+// @version      4.7.0
 // @description  Adds shortcuts to Netsuite task pages.
 // @author       JSM
 // @match        https://*.netsuite.com/app/crm/calendar/task.nl?l=T&*
@@ -33,7 +33,7 @@
 
     const invoiceMessages = {
         "Supply Only": { message: "Hi Wendy,\n\nCan this order be invoiced as is please?\n\nThank you.", title: " – Supply only – To be invoiced", priority: "Medium" },
-        "Labour Only (T&M)": { message: "Hi Wendy,\n\nCan this order be invoiced under time and materials please?\n\nThank you.", title: " – Labour only – To be invoiced", priority: "Medium" },
+        "Time & Materials": { message: "Hi Wendy,\n\nCan this order be invoiced under time and materials please?\n\nThank you.", title: " – Time & Materials – To be invoiced", priority: "Medium" },
         Project: { message: "Hi Wendy,\nCan this order be invoiced as a 1 line item please?\n\nThank you.", title: " – Project – To be invoiced", priority: "Medium" },
         "Supply & Fit": { message: "Hi Wendy,\n\nCan this order be invoiced as is please? (Showing labour + parts)\n\nThank you", title: " – Supply & Fit – To be invoiced", priority: "Medium" },
         "£0.00 Invoice": { message: "Hi Wendy,\n\nCan this order be invoiced as £0.00 please?\n\nThank you", title: " – Supply & Fit – To be invoiced", priority: "Medium" },
