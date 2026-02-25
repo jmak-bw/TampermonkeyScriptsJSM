@@ -1,11 +1,10 @@
 // ==UserScript==
 // @name         [Netsuite] Task Page Shortcuts (MK)
 // @namespace    http://tampermonkey.net/
-// @version      4.4.4
+// @version      4.5.0
 // @description  Adds shortcuts to Netsuite task pages. Custom script for MK.
 // @author       JSM
-// @match        https://*.netsuite.com/app/crm/calendar/task.nl?l=T&*
-// @match        https://7142405.app.netsuite.com/app/crm/calendar/task.nl?id=*
+// @match        https://*.netsuite.com/app/crm/calendar/task.nl*
 // @grant        GM_addStyle
 // @run-at       document-body
 // @updateURL    https://raw.githubusercontent.com/jmak-bw/TampermonkeyScriptsJSM/main/Custom/MK/Netsuite-Task-Page-Shortcuts-MK.user.js
@@ -324,7 +323,13 @@
 
 
     // Check if the URL contains the correct string
-    if (window.location.href.includes('/app/crm/calendar/task.nl?l=T&')) {
+    const params = new URLSearchParams(window.location.search);
+
+    const isTaskPage = window.location.pathname.includes('/app/crm/calendar/task.nl');
+    const isEdit = params.get('e') === 'T';
+    const isNew = !params.has('id'); // new task has no id
+
+    if (isTaskPage && params.get('l') === 'T' && (isEdit || isNew)) {
         let savedDueDate = null;
 
         // Combined window load listener
