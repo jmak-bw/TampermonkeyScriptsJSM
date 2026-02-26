@@ -1,9 +1,8 @@
 // ==UserScript==
 // @name         [Netsuite] Floating Info Button v2
-// @version      1.0
+// @version      1.1
 // @description  Floating button to display extracted info from (Related Records) #links_splits table
-// @match        https://*.app.netsuite.com/app/accounting/transactions/salesord.nl?id=*
-// @match        https://*.app.netsuite.com/app/accounting/transactions/purchord.nl?id=*
+// @match        https://*.app.netsuite.com/app/accounting/transactions/*
 // @author       JSM
 // @grant        none
 // @run-at       document-idle
