@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         [Netsuite] Task Page Shortcuts
 // @namespace    http://tampermonkey.net/
-// @version      5.0.0
+// @version      5.0.1
 // @description  Adds shortcuts to Netsuite task pages.
 // @author       JSM
 // @match        https://*.netsuite.com/app/crm/calendar/task.nl*
@@ -29,7 +29,6 @@
         "Lutts Collection": { message: "Hi Trevor,\n\nLutts will be coming to collect this order on *SDate*. Would you be able to prepare the order for collection please?\n\nThank you!", title: " – To be collected via Lutts", priority: "High" },
         "Bin collection": { message: "Hi Vaughan,\n\nCould you please pick this order and leave it in the BIN outside to be collected?\n\nThank you!", title: " – To be collected from BIN", priority: "Low" }
     };
-
     const invoiceMessages = {
         "Supply Only": { message: "Hi Wendy,\n\nCan this order be invoiced as is please?\n\nThank you.", title: " – Supply only – To be invoiced", priority: "Medium" },
         "Time & Materials": { message: "Hi Wendy,\n\nCan this order be invoiced under time and materials please?\n\nThank you.", title: " – Time & Materials – To be invoiced", priority: "Medium" },
@@ -44,9 +43,53 @@
         PO: { message: "Hi Matt,\n\nCould you please raise a PO for the below item(s) please?\n\n\n\nThank you!", title: " – PO to be raised", priority: "High" },
         "Pt No. + PO": { message: "Dear Purchasing Team,\n\nCan you please raise a new part number and PO for the items below please?\n\n[PT No.]\n\nThank you!", title: " – Part no. + PO to be raised – PDR items", priority: "Medium" },
         ETA: { message: "Dear Purchasing Team,\n\nWould you be able to provide an ETA for the below items please?\nThe client is chasing us. \n\n\n\n\nThank you!", title: " – ETA delivery", priority: "High" }
-
     };
 
+    function updateFields(type, messageData) {
+        console.log("updateFields: Running... ", new Date().toLocaleString());
+        extractSDate();
+        let titleInput = document.getElementById("title");
+        let messageInput = document.getElementById("message");
+        let assignedDisplay = document.getElementById("assigned_display");
+        let assignedHidden = document.getElementById("hddn_assigned_fs");
+
+        if (titleInput && messageInput && assignedDisplay && assignedHidden) {
+            let updated = false;
+            // Update title and message
+            // ✅ Use fallback if SOID is missing
+            if (SOID) {
+                titleInput.value = SOID + messageData.title;
+            } else if (itemTitle) {
+                titleInput.value = itemTitle + messageData.title;
+            } else {
+                titleInput.value = messageData.title; // last resort
+            }
+            messageInput.value = messageData.message.replace("*SDate*", SDate);
+            // Set assignedDisplay and assignedHidden based on the type of message
+            if (type === "invoice") {
+                assignedDisplay.value = "Wendy Hollands";
+                assignedHidden.value = "2382";
+            } else if (type === "dispatch") {
+                assignedDisplay.value = "Vaughan Wonnacot";
+                assignedHidden.value = "2182";
+            } else if (type === "Purchase") {
+                assignedDisplay.value = "Matt Shillito";
+                assignedHidden.value = "2181";
+            }
+            updated = true;
+            console.log("updateFields: Success: ", {
+                title: titleInput.value,
+                message: messageInput.value,
+                assigned: assignedDisplay.value
+            }); // Log the updated fields
+            // Update priority based on the message data
+            if (messageData.priority) {
+                updatePriority(messageData.priority);
+            }
+            showPopup(updated ? 'Success. Fields updated.' : 'Nothing changed.', updated ? 'green' : 'red');
+        }
+    }
+    //Start updating the code here
     // Helper to grab the transaction element no matter the profile
     function getTransactionElement() {
         if (document.getElementById('transaction_display')) {
@@ -239,19 +282,23 @@
     }
     // Define engineer options
     const engineerOptions = [
-        { name: "Steve NIMMO", code: "SAN" },
-        { name: "Ian GRUBB", code: "IG" },
-        { name: "Ian COPE", code: "IC" },
-        { name: "Mark MURGATROYD", code: "MBM" },
-        { name: "Phil WILSON", code: "PW" },
+        { name: "Andy NEWELL", code: "AN" },
+        { name: "Ben PEPLOW", code: "BP" },
+        { name: "Corey DOMAN", code: "CDD" },
         { name: "Duncan ATKINSON", code: "DA" },
+        { name: "Hayden KELLY", code: "HK" },
+        { name: "Ian COPE", code: "IC" },
+        { name: "Ian GRUBB", code: "IG" },
         { name: "Joe GALLAGHER", code: "JAG" },
         { name: "John IRVINE", code: "JI" },
         { name: "Mark HORRIDGE", code: "MH" },
+        { name: "Mark MURGATROYD", code: "MBM" },
+        { name: "Matthew KELLY", code: "MK" },
         { name: "Matthew TERRY", code: "MT" },
-        { name: "Corey DOMAN", code: "CDD" },
-        { name: "Ben PEPLOW", code: "BP" },
+        { name: "Nathan COCKERILL", code: "NC" },
+        { name: "Phil WILSON", code: "PW" },
         { name: "Robert MCGINTY", code: "RM" },
+        { name: "Steve NIMMO", code: "SAN" },
         { name: "Bill GIBBONS", code: "BG" }
     ];
     // Add engineer dropdown after "Engineer (F1)" is selected
@@ -397,6 +444,8 @@
             if (calendarIcon) {
                 const updateButton = document.createElement('button');
                 updateButton.innerHTML = 'Update';
+
+                // ... (your existing button styling)
                 updateButton.style.display = "inline-block";
                 updateButton.style.marginLeft = "15px";
                 updateButton.style.backgroundColor = '#ffa600';
@@ -410,18 +459,13 @@
                 // Append it to the parent span of the calendar icon
                 calendarIcon.parentNode.appendChild(updateButton);
 
+                // FIX: Add the event listener HERE, inside the same scope
                 updateButton.addEventListener('click', function(e) {
                     e.preventDefault();
                     handleUpdateClick();
+                    console.log("handleUpdateClick: Success. ", new Date().toLocaleString());
                 });
             }
-
-            // Button click handler
-            updateButton.addEventListener('click', function() {
-                // Trigger the first click
-                handleUpdateClick();
-                console.log("handleUpdateClick: Success. ", new Date().toLocaleString());
-            });
 
             function handleUpdateClick() {
                 console.log("handleUpdateClick: Running... ", new Date().toLocaleString());
@@ -632,58 +676,7 @@
 
         return `rgb(${r}, ${g}, ${b})`;
     }
-    function updateFields(type, messageData) {
-        console.log("updateFields: Running... ", new Date().toLocaleString());
-        extractSDate();
-        let titleInput = document.getElementById("title");
-        let messageInput = document.getElementById("message");
-        let assignedDisplay = document.getElementById("assigned_display");
-        let assignedHidden = document.getElementById("hddn_assigned_fs");
-
-        if (titleInput && messageInput && assignedDisplay && assignedHidden) {
-            let updated = false;
-
-            // Update title and message
-            // ✅ Use fallback if SOID is missing
-            if (SOID) {
-                titleInput.value = SOID + messageData.title;
-            } else if (itemTitle) {
-                titleInput.value = itemTitle + messageData.title;
-            } else {
-                titleInput.value = messageData.title; // last resort
-            }
-
-            messageInput.value = messageData.message.replace("*SDate*", SDate);
-
-
-            // Set assignedDisplay and assignedHidden based on the type of message
-            if (type === "invoice") {
-                assignedDisplay.value = "Wendy Hollands";
-                assignedHidden.value = "2382";
-            } else if (type === "dispatch") {
-                assignedDisplay.value = "Vaughan Wonnacot";
-                assignedHidden.value = "2182";
-            } else if (type === "Purchase") {
-                assignedDisplay.value = "Matt Shillito";
-                assignedHidden.value = "2181";
-            }
-
-            updated = true;
-
-            console.log("updateFields: Success: ", {
-                title: titleInput.value,
-                message: messageInput.value,
-                assigned: assignedDisplay.value
-            }); // Log the updated fields
-
-            // Update priority based on the message data
-            if (messageData.priority) {
-                updatePriority(messageData.priority);
-            }
-
-            showPopup(updated ? 'Success. Fields updated.' : 'Nothing changed.', updated ? 'green' : 'red');
-        }
-    }
+    
 
     // Function to show popup messages
     function showPopup(message, color, borderRadius="5px") {
