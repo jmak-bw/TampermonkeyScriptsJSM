@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         [Netsuite] Task Page Shortcuts
 // @namespace    http://tampermonkey.net/
-// @version      4.9.1
+// @version      5.0.0
 // @description  Adds shortcuts to Netsuite task pages.
 // @author       JSM
 // @match        https://*.netsuite.com/app/crm/calendar/task.nl*
@@ -183,26 +183,36 @@
         }
     }
 
+    // 1. Updated Fill Button: Now attaches to the Title Field Wrapper
     function addFillButton() {
-        console.log("addFillButton: Running... ", new Date().toLocaleString());
-        let button = document.createElement("button");
-        button.innerText = "Fill";
-        button.style.position = "absolute";
-        button.style.top = "206px";
-        button.style.left = "315px";
-        button.style.zIndex = "9999"; // Ensure it stays on top
-        button.style.background = "#007bff";
-        button.style.color = "white";
-        button.style.border = "none";
-        button.style.padding = "3px 10px";
-        button.style.cursor = "pointer";
-        button.style.borderRadius = "5px";
-        button.style.opacity = "0.2"; // Adjust opacity
-        button.onmouseover = function() { button.style.opacity = "1.0"; };
-        button.onmouseout = function() { button.style.opacity = "0.2"; }; // Adjust opacity
-        button.style.boxShadow = "0px 4px 6px rgba(0,0,0,0.1)";
-        button.onclick = pasteSOID;
-        document.body.appendChild(button);
+        console.log("addFillButton: Targetting Title Wrapper...");
+        // Use the data-field-name attribute you provided
+        let titleWrapper = document.querySelector('div[data-field-name="title"]');
+
+        if (titleWrapper) {
+            let button = document.createElement("button");
+            button.innerText = "Fill";
+            // Use inline-block so it sits next to the field
+            button.style.display = "inline-block";
+            button.style.marginLeft = "10px";
+            button.style.verticalAlign = "middle";
+            button.style.background = "#007bff";
+            button.style.color = "white";
+            button.style.border = "none";
+            button.style.padding = "2px 8px";
+            button.style.cursor = "pointer";
+            button.style.borderRadius = "3px";
+            button.style.fontSize = "14px";
+            button.style.opacity = "0.6";
+            button.onmouseover = () => { button.style.opacity = "1.0"; };
+            button.onmouseout = () => { button.style.opacity = "0.6"; };
+            button.onclick = (e) => {
+                e.preventDefault(); // Prevent any NetSuite default actions
+                pasteSOID();
+            };
+
+            titleWrapper.appendChild(button);
+        }
     }
 
 
@@ -245,23 +255,45 @@
         { name: "Bill GIBBONS", code: "BG" }
     ];
     // Add engineer dropdown after "Engineer (F1)" is selected
+    ///////////////
     function createEngineerDropdown() {
-        console.log("createEngineerDropdown: Running... ", new Date().toLocaleString());
+        console.log("createEngineerDropdown: Injecting into button bar...");
+
+        // 1. Get the bar we already created
+        let groupContainer = document.getElementById('jsm-button-bar');
+        if (!groupContainer) return;
+
+        // 2. Remove existing one if it exists
+        let existing = document.getElementById('engineer-dropdown-container');
+        if (existing) existing.remove();
+
+        // 3. Create container
         let container = document.createElement("div");
-        container.style.position = "fixed";
-        container.style.top = "80px"; // Adjust to position below Dispatch dropdown
-        container.style.right = "160px";
-        container.style.zIndex = "1000";
+        container.id = 'engineer-dropdown-container';
+        // Remove position: fixed; it will now flow with the flexbox bar
+        container.style.display = "flex";
+        container.style.alignItems = "center";
 
+        // 4. Create the select
         let select = document.createElement("select");
-        select.style.padding = "8px";
+        select.style.padding = "6px";
         select.style.fontSize = "14px";
-        select.style.fontWeight = "bold";
         select.style.borderRadius = "5px";
-        select.style.border = "2px solid black";
-        select.style.backgroundColor = "#FF5733";
-        select.style.color = "white";
+        select.style.border = "1px solid #FF5733";
 
+        select.onclick = (e) => {
+            e.stopPropagation(); // Prevents the header collapse
+        };
+
+        select.onchange = function(e) {
+            e.stopPropagation(); // Also prevent bubbling on change
+            const selectedEngineer = engineerOptions.find(e => e.code === select.value);
+            if (selectedEngineer) {
+                updateEngineerDetails(selectedEngineer);
+                container.remove();
+            }
+        };
+        // ------------------------------
         let defaultOption = document.createElement("option");
         defaultOption.innerText = "Select Engineer";
         defaultOption.disabled = true;
@@ -279,13 +311,14 @@
             const selectedEngineer = engineerOptions.find(e => e.code === select.value);
             if (selectedEngineer) {
                 updateEngineerDetails(selectedEngineer);
-                container.remove(); // Remove the dropdown after selection
+                container.remove();
             }
         };
 
         container.appendChild(select);
-        document.body.appendChild(container);
+        groupContainer.insertBefore(container, groupContainer.firstChild);
     }
+    /////
 
     // Function to update message and title based on selected engineer
     function updateEngineerDetails(engineer) {
@@ -337,9 +370,10 @@
 
     const isTaskPage = window.location.pathname.includes('/app/crm/calendar/task.nl');
     const isEdit = params.get('e') === 'T';
-    const isNew = !params.has('id'); // new task has no id
+    const isNew = !params.has('id'); // New tasks usually don't have an ID in the URL yet
 
-    if (isTaskPage && params.get('l') === 'T' && (isEdit || isNew)) {
+    // REMOVED: params.get('l') === 'T'
+    if (isTaskPage && (isEdit || isNew)) {
         let savedDueDate = null;
 
         // Combined window load listener
@@ -359,23 +393,28 @@
             console.log("addFillButton: Success. Button created. (Fill)", new Date().toLocaleString());
 
             // Create the "Update Date" button
-            const updateButton = document.createElement('button');
-            updateButton.innerHTML = 'Update';  // Break the text into two lines using <br>
-            updateButton.style.position = 'absolute';
-            updateButton.style.top = '487px';
-            updateButton.style.left = '334px';
-            updateButton.style.padding = '5px 5px';  // Smaller padding for a smaller button
-            updateButton.style.backgroundColor = '#ffa600';
-            updateButton.style.color = 'white';
-            updateButton.style.border = 'none';
-            updateButton.style.borderRadius = '5px';
-            updateButton.style.fontSize = '12px';  // Smaller font size
-            updateButton.style.fontWeight = 'bold';
-            updateButton.style.cursor = 'pointer';
-            updateButton.style.whiteSpace = 'normal';  // Allows the text to wrap
-            updateButton.style.textAlign = 'center';  // Center-align the text
-            updateButton.style.lineHeight = '1.2';  // Adjust line height for better spacing
-            document.body.appendChild(updateButton);
+            const calendarIcon = document.getElementById('duedate_helper_calendar');
+            if (calendarIcon) {
+                const updateButton = document.createElement('button');
+                updateButton.innerHTML = 'Update';
+                updateButton.style.display = "inline-block";
+                updateButton.style.marginLeft = "15px";
+                updateButton.style.backgroundColor = '#ffa600';
+                updateButton.style.color = 'white';
+                updateButton.style.border = 'none';
+                updateButton.style.borderRadius = '6px';
+                updateButton.style.padding = "2px 8px";
+                updateButton.style.fontSize = '14px';
+                updateButton.style.cursor = 'pointer';
+
+                // Append it to the parent span of the calendar icon
+                calendarIcon.parentNode.appendChild(updateButton);
+
+                updateButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    handleUpdateClick();
+                });
+            }
 
             // Button click handler
             updateButton.addEventListener('click', function() {
@@ -469,88 +508,103 @@
         console.log("updatePriority: priorityHidden.value:", priorityHidden.value);
         console.log("updatePriority: priorityIndex.value:", priorityIndex.value);
     }
-    const positions = {
-        Dispatch: "250px",
-        Invoice: "152px",
-        Purchase: "40px"
-    };
 
+    // 2. Updated Dropdown Logic: Attaches to the "Primary Information" Header
     function createDropdown(name, options, handler, color) {
-        console.log("createDropdown: Running... (", name,")", new Date().toLocaleString());
+        // 1. Safety Check: Find the header first
+        const headers = document.querySelectorAll('.fgroup_title.uir-field-group-title');
+        let targetHeader = Array.from(headers).find(el => el.textContent.includes("Primary Information"));
 
-        let container = document.createElement("div");
-        container.style.position = "fixed";
-        container.style.top = "10px";
-        container.style.right = positions[name] || "0px";
-        container.style.zIndex = "1000";
+        // If targetHeader is not found, exit gracefully instead of throwing an error
+        if (!targetHeader) {
+            console.warn("createDropdown: Could not find 'Primary Information' header.");
+            return;
+        }
 
-        // Check if the button already exists. If it does, return to prevent creating a new one.
-        let existingMainButton = document.getElementById(name);
-        if (existingMainButton) return;
+        let fgroup = targetHeader.parentElement;
+        let groupContainer = document.getElementById('jsm-button-bar');
 
-        // Create a main button (like Dispatch or Invoice)
+        // 2. Create container only if it doesn't exist
+        if (!groupContainer) {
+            groupContainer = document.createElement("div");
+            groupContainer.id = 'jsm-button-bar';
+            groupContainer.style.display = "flex";
+            groupContainer.style.justifyContent = "flex-end";
+            groupContainer.style.gap = "5px";
+            groupContainer.style.marginBottom = "5px";
+            groupContainer.style.marginTop = "-50px";
+            fgroup.insertBefore(groupContainer, targetHeader);
+        }
+
+        // 3. Create Main Button
         let mainButton = document.createElement("button");
-        mainButton.id = name;  // Set an ID to identify this button
+        mainButton.type = "button"; // ADD THIS LINE
+        mainButton.innerText = name;
         mainButton.innerText = name;
         mainButton.style.padding = "8px 20px";
-        mainButton.style.fontSize = "14px";
-        mainButton.style.fontWeight = "bold";
+        mainButton.style.fontSize = "16px";
+        mainButton.style.minWidth = "140px";
         mainButton.style.borderRadius = "5px";
-        mainButton.style.border = "0px";
+        mainButton.style.border = "none";
         mainButton.style.backgroundColor = color;
         mainButton.style.color = "white";
         mainButton.style.cursor = "pointer";
-        mainButton.style.position = "relative"; // Ensures the dropdown appears below it
-        mainButton.style.minWidth = "50px";
+        mainButton.style.position = "relative";
 
-        // Create a container for the option buttons (initially hidden)
+        // 4. Create Option Container
         let optionContainer = document.createElement("div");
-        optionContainer.style.display = "none";  // Hidden by default
+        optionContainer.style.display = "none";
         optionContainer.style.flexDirection = "column";
-        optionContainer.style.gap = "5px"; // Space between buttons (reduced to make them smaller)
-        optionContainer.style.position = "absolute"; // Position the dropdown content absolutely
-        optionContainer.style.top = "100%"; // Position it right below the main button
-        optionContainer.style.left = "0"; // Align to the left edge of the main button
-        optionContainer.style.marginTop = "5px"; // Slightly move the options down for spacing
-        optionContainer.style.zIndex = '9999';
-        optionContainer.style.minWidth = "50px";
+        optionContainer.style.position = "absolute";
+        optionContainer.style.top = "100%";
+        optionContainer.style.right = "0";
+        optionContainer.style.zIndex = "9999";
+        optionContainer.style.backgroundColor = "white";
+        optionContainer.style.boxShadow = "0px 4px 8px rgba(0,0,0,0.2)";
 
-        mainButton.onclick = function () {
-            // Only toggle the dropdown if it's not already visible
-            optionContainer.style.display = optionContainer.style.display === "none" ? "flex" : "none";
+        mainButton.onclick = (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+
+            // Toggle current
+            const isCurrentlyVisible = optionContainer.style.display === "flex";
+            optionContainer.style.display = isCurrentlyVisible ? "none" : "flex";
         };
 
+        // 5. Add Options
         Object.keys(options).forEach(key => {
-            let optionButton = document.createElement("button");
-            optionButton.innerText = key;
-            optionButton.style.padding = "5px 10px";
-            optionButton.style.fontSize = "12px";
-            optionButton.style.fontWeight = "normal";
-            optionButton.style.borderRadius = "4px";
-            optionButton.style.border = "1px solid white";
-            optionButton.style.backgroundColor = lightenColor(color, 0.2);
-            optionButton.style.color = "white";
-            optionButton.style.cursor = "pointer";
-            optionButton.style.width = "100px";
-            optionButton.style.height = "50px";
+            let opt = document.createElement("button");
+            opt.type = "button";
+            opt.innerText = key;
+            opt.style.padding = "12px 20px";
+            opt.style.border = "none";
+            opt.style.background = "none";
+            opt.style.cursor = "pointer";
+            opt.style.width = "100%"; // Ensures full width for easier clicking
+            opt.style.textAlign = "left"; // Aligns text to the left
 
-            optionButton.onclick = () => {
+            opt.onclick = (e) => {
+                e.stopPropagation();
                 handler(key);
                 optionContainer.style.display = "none";
+
+                // --- ADD THIS LOGIC ---
                 if (key === "Engineer (F1)") {
                     createEngineerDropdown();
                 } else {
-                    const engineerDropdown = document.querySelector("div select");
-                    if (engineerDropdown) engineerDropdown.remove();
+                    const engDropdown = document.getElementById('engineer-dropdown-container');
+                    if (engDropdown) engDropdown.remove();
                 }
+                // -----------------------
             };
-
-            optionContainer.appendChild(optionButton);
+            optionContainer.appendChild(opt);
         });
 
-        container.appendChild(mainButton);
-        container.appendChild(optionContainer);
-        document.body.appendChild(container);
+        // 6. Final safety check before appending
+        if (groupContainer && mainButton) {
+            mainButton.appendChild(optionContainer);
+            groupContainer.appendChild(mainButton);
+        }
     }
 
     // Function to lighten a given color by a percentage
