@@ -538,7 +538,7 @@
 
         // 3. Create Main Button
         let mainButton = document.createElement("button");
-        mainButton.type = "button"; // ADD THIS LINE
+        mainButton.type = "button";
         mainButton.innerText = name;
         mainButton.innerText = name;
         mainButton.style.padding = "8px 20px";
@@ -588,7 +588,6 @@
                 handler(key);
                 optionContainer.style.display = "none";
 
-                // --- ADD THIS LOGIC ---
                 if (key === "Engineer (F1)") {
                     createEngineerDropdown();
                 } else {
