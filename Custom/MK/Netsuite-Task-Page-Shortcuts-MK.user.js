@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         [Netsuite] Task Page Shortcuts (MK)
 // @namespace    http://tampermonkey.net/
-// @version      5.0.1
+// @version      5.0.2
 // @description  Adds shortcuts to Netsuite task pages. Custom script for MK.
 // @author       JSM
 // @match        https://*.netsuite.com/app/crm/calendar/task.nl*
@@ -241,6 +241,7 @@
             // Use inline-block so it sits next to the field
             button.style.display = "inline-block";
             button.style.marginLeft = "10px";
+            button.style.marginTop = "-10px";
             button.style.verticalAlign = "middle";
             button.style.background = "#007bff";
             button.style.color = "white";
@@ -589,7 +590,7 @@
         mainButton.innerText = name;
         mainButton.innerText = name;
         mainButton.style.padding = "8px 20px";
-        mainButton.style.fontSize = "16px";
+        mainButton.style.fontSize = "14px";
         mainButton.style.minWidth = "140px";
         mainButton.style.borderRadius = "5px";
         mainButton.style.border = "none";
@@ -597,6 +598,7 @@
         mainButton.style.color = "white";
         mainButton.style.cursor = "pointer";
         mainButton.style.position = "relative";
+        mainButton.style.fontWeight = "bold";
 
         // 4. Create Option Container
         let optionContainer = document.createElement("div");
