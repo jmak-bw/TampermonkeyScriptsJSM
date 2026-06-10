@@ -577,7 +577,7 @@
             groupContainer.style.justifyContent = "flex-end";
             groupContainer.style.gap = "5px";
             groupContainer.style.marginBottom = "5px";
-            groupContainer.style.marginTop = "-50px";
+            groupContainer.style.marginTop = "-30px";
             fgroup.insertBefore(groupContainer, targetHeader);
         }
 
