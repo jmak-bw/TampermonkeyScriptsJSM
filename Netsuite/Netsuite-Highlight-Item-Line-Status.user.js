@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         [Netsuite] Visual aid for items on transaction page
 // @namespace    http://tampermonkey.net/
-// @version      1.1.2
+// @version      1.2
 // @description  Highlight rows based on Back Ordered and Fulfilled; highlight Invoiced column green if fully invoiced; skip rows with empty Available; show summary counts above table
 // @author       JSM
 // @match        https://*.app.netsuite.com/app/accounting/transactions/salesord.nl?id=*
@@ -70,7 +70,34 @@
         return table.__tmSummaryBox;
     }
 
+    function freezeColumns(table) {
+        const rows = table.querySelectorAll('tr');
+
+        rows.forEach(row => {
+            const cells = row.children;
+
+            if (cells[1]) {
+                cells[1].style.position = 'sticky';
+                cells[1].style.left = '0px';
+                cells[1].style.zIndex = '20';
+                cells[1].style.background = 'inherit';
+            }
+
+            if (cells[2]) {
+                cells[2].style.position = 'sticky';
+
+                // Width of column 2
+                const col2Width = cells[1]?.offsetWidth || 120;
+
+                cells[2].style.left = `${col2Width}px`;
+                cells[2].style.zIndex = '20';
+                cells[2].style.background = 'inherit';
+            }
+        });
+    }
+
     function scanAndHighlight(table) {
+        freezeColumns(table);
         const getQuantity = makeCellGetter(table, 'Quantity');
         const getFulfilled = makeCellGetter(table, 'Fulfilled');
         const getInvoiced = makeCellGetter(table, 'Invoiced');
