@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         [Netsuite] Task Page Shortcuts (MK)
 // @namespace    http://tampermonkey.net/
-// @version      5.0.2
+// @version      5.0.3
 // @description  Adds shortcuts to Netsuite task pages. Custom script for MK.
-// @author       JSM
+// @author       JSM_MDK
 // @match        https://*.netsuite.com/app/crm/calendar/task.nl*
 // @grant        GM_addStyle
 // @run-at       document-body
@@ -21,28 +21,31 @@
 
     const dispatchMessages = {
         "Ship (DAP)": { message: "Hi Vaughan,\n\nCan this order go out on *SDate* please?\n\nThank you.", title: " – To be dispatched", priority: "Medium" },
-        "Urgent AM": { message: "Hi Vaughan,\n\nCan this order go out on *SDate* for pre-9am delivery please?\n\nThank you.", title: " – Pre-9am – To be dispatched", priority: "High" },
+        "Urgent AM": { message: "Hi Vaughan,\n\nCan this order go out on *SDate* for pre-9am delivery please?\n\nThank you.", title: " – Pre~9am – To be dispatched", priority: "High" },
         Taxi: { message: "Hi Vaughan,\n\nCan you pick and pack this order for *SDate* please? Wayne is coming to collect.\n\nThank you.", title: " – Urgent – Taxi collection", priority: "High" },
-        International: { message: "Hi Vaughan,\n\nThis is an international order. \nCould you please pick and pack this order? Once done, please let us know and we will handle the commercial invoice and shipping.\n\nThank you.", title: " – To pick & pack – International Order", priority: "Medium" },
+        International: { message: "Hi Vaughan,\n\nThis is an international order. \n\nCould you please pick and pack this order? Once done, please let us know and we will handle the commercial invoice and shipping.\n\nThank you.", title: " – To pick & pack – International Order", priority: "Medium" },
         "EX-WORKS": { message: "Hi Vaughan,\n\nCan you pick and pack this order and let us know once it's done please? \nThe client will be collecting this order.\n\nThank you.", title: " – To pick & pack – Client to collect", priority: "Medium" },
         "Engineer (F1)": { message: "Hi Vaughan,\n\nCan this go out to [ENGINEER]'s home address please?\n\nThank you!", title: " – Dispatch to [E] home address", priority: "Low" },
         "Lutts Collection": { message: "Hi Trevor,\n\nLutts will be coming to collect this order on *SDate*. Would you be able to prepare the order for collection please?\n\nThank you!", title: " – To be collected via Lutts", priority: "High" },
-        "Bin collection": { message: "Hi Vaughan,\n\nCould you please pick this order and leave it in the BIN outside to be collected?\n\nThank you!", title: " – To be collected from BIN", priority: "Low" }
+        "Bin collection": { message: "Hi Vaughan,\n\nCould you please pick & pack this order and leave it in the BIN outside to be collected?\n\nThank you!", title: " – To be collected from BIN", priority: "Medium" },
     };
+    
     const invoiceMessages = {
-        "Supply Only": { message: "Hi Carol,\n\nCan this order be invoiced as is please?\n\nThank you.", title: " – Supply only – To be invoiced", priority: "Medium" },
-        "Labour Only (T&M)": { message: "Hi Carol,\n\nCan this order be invoiced under time and materials please?\n\nThank you.", title: " – Labour only – To be invoiced", priority: "Medium" },
-        Project: { message: "Hi Carol,\nCan this order be invoiced as a 1 line item please?\n\nThank you.", title: " – Project – To be invoiced", priority: "Medium" },
-        "Supply & Fit": { message: "Hi Carol,\n\nCan this order be invoiced as is please? (Showing labour + parts)\n\nThank you", title: " – Supply & Fit – To be invoiced", priority: "Medium" },
-        "£0.00 Invoice": { message: "Hi Carol,\n\nCan this order be invoiced as £0.00 please?\n\nThank you", title: " – Supply & Fit – To be invoiced", priority: "Medium" },
-        "Proforma Invoice": {message: "Hi Carol,\n\nCan this order be invoiced as is, please? It has been dispatched and paid via proforma invoice.\n\nThank you.", title: " – Proforma order – To be invoiced", priority: "Medium" },
-        "Credit Note": {message: "Hi Carol,\n\nCan you raise a credit note for this order, please? I will give you the signed form.\n\nThank you.", title: " – Credit Note", priority: "Medium" }
+        "D-Invoice": { message: "Hi Carol,\n\nPlease raise a D-Deposit invoice for this project.\n\n[POXXXX] (Main contract PO)\n\n30% with order. Manufacturing to commence on receipt of deposit payment.\n\n£/€ XX,XXX.XX\n\nThank you.", title: "-[BXXXXX] – D-Deposit – To be invoiced", priority: "High" },
+        "NS Deposit": { message: "Hi Carol,\n\nPlease raise a NS Deposit invoice for this project.\n\n[POXXXX] (Main contract PO)\n\n30% with order. Manufacturing to commence on receipt of deposit payment.\n\n£/€ XX,XXX.XX\n\nThank you.", title: "-[BXXXXX] – NS Deposit – To be invoiced", priority: "High" },
+        "2nd Stage": { message: "Hi Carol,\n\nPlease raise a the 2nd stage invoice for this project.\n\n[POXXXX] (Main contract PO)\n\n60% after fabrication, before delivery.\n\n£/€ XX,XXX.XX\n\nThank you.", title: "-[BXXXXX] – 2nd Stage – To be invoiced", priority: "Medium" },
+        "Before Cmg": { message: "Hi Carol,\n\nPlease raise a the Before Cmg invoice for this project.\n\n[POXXXX] (Main contract PO)\n\n10% prior to commissioning.\n\n£/€ XX,XXX.XX\n\nThank you.", title: "-[BXXXXX] – Before Cmg – To be invoiced", priority: "Medium" },
+        "After Cmg": { message: "Hi Carol,\n\nPlease raise a the After Cmg invoice for this project.\n\n[POXXXX] (Main contract PO)\n\n10% after commissioning.\n\n£/€ XX,XXX.XX\n\nThank you.", title: "-[BXXXXX] – After Cmg – To be invoiced", priority: "Medium" },
+        "Additional Inv": { message: "Hi Carol,\n\nPlease raise an additional invoice for this project.\n\n[POXXXX]\n\n[Enter reason for additional charge]\n\n£/€ XX,XXX.XX\n\nThank you.", title: "-[BXXXXX] – Additional Inv – To be invoiced", priority: "Medium" },
+        "Credit Note": { message: "Hi Carol,\n\nPlease raise a credit note for this order. I have filled and approved the RMA.\n\nThe amount of £/€ XX,XXX.XX is to be credited\n\nThank you.", title: " – Credit Note", priority: "Medium" },
+        "Final System Inv": { message: "Hi Carol,\n\nPlease raise a final system invoice for this order. This project is completed.\n\nDo not sent to the customer.\n\nThank you.", title: " – Final System Invoice", priority: "Medium" },
     };
+    
     const purchaseMessages = {
-        "No stock": { message: "Hi Matt,\n\nCould you please raise an order for more off [PT No.]? There's none left in stock.\n\nThank you!", title: " – PO to be raise – None left in stock", priority: "Medium" },
-        PO: { message: "Hi Matt,\n\nCould you please raise a PO for the below item(s) please?\n\n\n\nThank you!", title: " – PO to be raised", priority: "High" },
-        "Pt No. + PO": { message: "Hi Matt,\n\nCan you please raise a new part number and PO for the items below please?\n\n[PT No.]\n\nThank you!", title: " – Part no. + PO to be raise – PDR items", priority: "Medium" },
-        ETA: { message: "Hi Matt,\n\nWould you be able to provide an ETA for the below items please?\nThe client is chasing us. \n\n\n\n\nThank you!", title: " – ETA delivery", priority: "High" }
+        "No stock": { message: "Hi Matt,\n\nCould you please raise an order for more off [PT No.]. To increase the stock level for this order.\n\nThank you!", title: " – PO to be raised – Increase stock level", priority: "Medium" },
+        "PO": { message: "Hi Matt,\n\nCould you please raise a PO for the below item(s).\n\n\n\nThank you!", title: " – PO to be raised", priority: "High" },
+        "ETA": { message: "Hi Matt,\n\nWould you be able to provide an ETA for the below items please.\nThe client is chasing us. \n\n\n\n\nThank you!", title: " – ETA delivery", priority: "High" },
+         "System Fulfilment": { message: "Hi Matt/Nicola,\n\nPlease could you manually fufill the items below, as they have been missed/went direct to site.\n\nThank you!", title: " – System Fulfilment", priority: "Low" },
     };
 
     function updateFields(type, messageData) {
