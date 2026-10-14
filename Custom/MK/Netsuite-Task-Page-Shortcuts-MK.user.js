@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         [Netsuite] Task Page Shortcuts (MK)
 // @namespace    http://tampermonkey.net/
-// @version      5.0.3
+// @version      5.0.5
 // @description  Adds shortcuts to Netsuite task pages. Custom script for MK.
 // @author       JSM_MDK
 // @match        https://*.netsuite.com/app/crm/calendar/task.nl*
@@ -29,23 +29,23 @@
         "Lutts Collection": { message: "Hi Trevor,\n\nLutts will be coming to collect this order on *SDate*. Would you be able to prepare the order for collection please?\n\nThank you!", title: " – To be collected via Lutts", priority: "High" },
         "Bin collection": { message: "Hi Vaughan,\n\nCould you please pick & pack this order and leave it in the BIN outside to be collected?\n\nThank you!", title: " – To be collected from BIN", priority: "Medium" },
     };
-    
+
     const invoiceMessages = {
         "D-Invoice": { message: "Hi Carol,\n\nPlease raise a D-Deposit invoice for this project.\n\n[POXXXX] (Main contract PO)\n\n30% with order. Manufacturing to commence on receipt of deposit payment.\n\n£/€ XX,XXX.XX\n\nThank you.", title: "-[BXXXXX] – D-Deposit – To be invoiced", priority: "High" },
         "NS Deposit": { message: "Hi Carol,\n\nPlease raise a NS Deposit invoice for this project.\n\n[POXXXX] (Main contract PO)\n\n30% with order. Manufacturing to commence on receipt of deposit payment.\n\n£/€ XX,XXX.XX\n\nThank you.", title: "-[BXXXXX] – NS Deposit – To be invoiced", priority: "High" },
-        "2nd Stage": { message: "Hi Carol,\n\nPlease raise a the 2nd stage invoice for this project.\n\n[POXXXX] (Main contract PO)\n\n60% on notification that the equipment is ready for and prior to despatch.\n\n£/€ XX,XXX.XX\n\nThank you.", title: "-[BXXXXX] – 2nd Stage – To be invoiced", priority: "Medium" },
-        "Before Cmg": { message: "Hi Carol,\n\nPlease raise a the Before Cmg invoice for this project.\n\n[POXXXX] (Main contract PO)\n\n10% one month after second payment due or prior to commissioning, whichever is the sooner.\n\n£/€ XX,XXX.XX\n\nThank you.", title: "-[BXXXXX] – Before Cmg – To be invoiced", priority: "Medium" },
-        "After Cmg": { message: "Hi Carol,\n\nPlease raise a the After Cmg invoice for this project.\n\n[POXXXX] (Main contract PO)\n\n10% after commissioning.\n\n£/€ XX,XXX.XX\n\nThank you.", title: "-[BXXXXX] – After Cmg – To be invoiced", priority: "Medium" },
+        "2nd Stage": { message: "Hi Carol,\n\nPlease raise the 2nd stage invoice for this project.\n\n[POXXXX] (Main contract PO)\n\n60% on notification that the equipment is ready for and prior to despatch.\n\n£/€ XX,XXX.XX\n\nThank you.", title: "-[BXXXXX] – 2nd Stage – To be invoiced", priority: "Medium" },
+        "Before Cmg": { message: "Hi Carol,\n\nPlease raise the Before Cmg invoice for this project.\n\n[POXXXX] (Main contract PO)\n\n10% one month after second payment due or prior to commissioning, whichever is the sooner.\n\n£/€ XX,XXX.XX\n\nThank you.", title: "-[BXXXXX] – Before Cmg – To be invoiced", priority: "Medium" },
+        "After Cmg": { message: "Hi Carol,\n\nPlease raise the After Cmg invoice for this project.\n\n[POXXXX] (Main contract PO)\n\n10% after commissioning.\n\n£/€ XX,XXX.XX\n\nThank you.", title: "-[BXXXXX] – After Cmg – To be invoiced", priority: "Medium" },
         "Additional Inv": { message: "Hi Carol,\n\nPlease raise an additional invoice for this project.\n\n[POXXXX]\n\n[Enter reason for additional charge]\n\n£/€ XX,XXX.XX\n\nThank you.", title: "-[BXXXXX] – Additional Inv – To be invoiced", priority: "Medium" },
         "Credit Note": { message: "Hi Carol,\n\nPlease raise a credit note for this order. I have filled and approved the RMA.\n\nThe amount of £/€ XX,XXX.XX is to be credited\n\nThank you.", title: " – Credit Note", priority: "Medium" },
-        "Final System Inv": { message: "Hi Carol,\n\nPlease raise a final system invoice for this order. This project is completed.\n\nDo not sent to the customer.\n\nThank you.", title: " – Final System Invoice", priority: "Medium" },
+        "Final System Inv": { message: "Hi Carol,\n\nPlease raise a final system invoice for this order. This project is completed.\n\nDo not send to the customer.\n\nThank you.", title: " – Final System Invoice", priority: "Medium" },
     };
-    
+
     const purchaseMessages = {
-        "No stock": { message: "Hi Matt,\n\nCould you please raise an order for more off [PT No.]. To increase the stock level for this order.\n\nThank you!", title: " – PO to be raised – Increase stock level", priority: "Medium" },
+        "No stock": { message: "Hi Matt,\n\nCould you please raise an order for more of [PT No.]. To increase the stock level for this order.\n\nThank you!", title: " – PO to be raised – Increase stock level", priority: "Medium" },
         "PO": { message: "Hi Matt,\n\nCould you please raise a PO for the below item(s).\n\n\n\nThank you!", title: " – PO to be raised", priority: "High" },
         "ETA": { message: "Hi Matt,\n\nWould you be able to provide an ETA for the below items please.\nThe client is chasing us. \n\n\n\n\nThank you!", title: " – ETA delivery", priority: "High" },
-         "System Fulfilment": { message: "Hi Matt/Nicola,\n\nPlease could you manually fufill the items below, as they have been missed/went direct to site.\n\nThank you!", title: " – System Fulfilment", priority: "Low",  assignedDisplay.value = "Nicola Gowler" },
+        "System Fulfilment": { message: "Hi Nicola,\n\nPlease could you manually fulfil the items below, as they have been missed/went direct to site.\n\nThank you!", title: " – System Fulfilment", priority: "Medium", assigneeName: "Nicola Gowler", assigneeId: "2179" },
     };
 
     function updateFields(type, messageData) {
@@ -80,6 +80,12 @@
             } else if (type === "Purchase") {
                 assignedDisplay.value = "Matt Shillito";
                 assignedHidden.value = "2181";
+            }
+
+            // Per-message override (e.g. System Fulfilment goes to Nicola)
+            if (messageData.assigneeName && messageData.assigneeId) {
+                assignedDisplay.value = messageData.assigneeName;
+                assignedHidden.value = messageData.assigneeId;
             }
 
             updated = true;
@@ -205,17 +211,6 @@
             console.log('extractItemTitle: relateditem_display not ready');
         }
     }
-
-    // Example of using the global SOID after extraction
-    function logSOID() {
-        console.log("Function logSOID: ", new Date());
-        console.log('Current SOID:', SOID);
-    }
-
-    // Check if the event listener on body prevents links
-    document.body.addEventListener('click', function(event) {
-    }, false);
-
 
     function pasteSOID() {
         console.log("Function pasteSOID: ", new Date());
@@ -361,14 +356,6 @@
             select.appendChild(optionElement);
         });
 
-        select.onchange = function() {
-            const selectedEngineer = engineerOptions.find(e => e.code === select.value);
-            if (selectedEngineer) {
-                updateEngineerDetails(selectedEngineer);
-                container.remove();
-            }
-        };
-
         container.appendChild(select);
         groupContainer.insertBefore(container, groupContainer.firstChild);
     }
@@ -382,7 +369,7 @@
 
         if (titleInput && messageInput) {
             const dispatchMessage = dispatchMessages["Engineer (F1)"];
-            titleInput.value = SOID + " – Dispatch to " + engineer.code + " home address";
+            titleInput.value = (SOID || itemTitle || "") + " – Dispatch to " + engineer.code + " home address";
             messageInput.value = dispatchMessage.message.replace("[ENGINEER]", engineer.name).replace("[E]", engineer.code);
             console.log("updateEngineerDetails: Success. Engineer updated: ", { title: titleInput.value, message: messageInput.value });
             showPopup('Success. Engineer updated.', 'green');
@@ -436,7 +423,7 @@
             extractSOID();
             extractItemTitle();
 
-            // Create dropdowns for Dispatch and Invoice
+            // Create dropdowns for Dispatch, Invoice and Purchase
             createDropdown("Dispatch", dispatchMessages, key => updateFields("dispatch", dispatchMessages[key]), "#FF5733");
             console.log("createDropdown: Success. Dropdown created. (Dispatch)", new Date().toLocaleString());
             createDropdown("Invoice", invoiceMessages, key => updateFields("invoice", invoiceMessages[key]), "#3388FF");
@@ -486,22 +473,19 @@
                         if (messageDate) {
                             if (messageDate === savedDueDate) {
                                 showPopup('Nothing updated. Same date.', 'red');
-                                console.log("extractDate: Success. ", new Date().toLocaleString());
-                                console.log("showPopup: Success. (Nothing updated. Same date.)', 'green ", new Date().toLocaleString());
+                                console.log("handleUpdateClick: Nothing updated. Same date.", new Date().toLocaleString());
 
                             } else {
                                 const updatedMessage = messageText.replace(messageDate, currentDueDate);
                                 messageElement.value = updatedMessage;
                                 showPopup('Success. Date in message updated.', 'green');
-                                console.log("extractDate: Success. ", new Date().toLocaleString());
-                                console.log("showPopup: Success. (Success. Date in message updated.)', 'green ", new Date().toLocaleString());
+                                console.log("handleUpdateClick: Date in message updated.", new Date().toLocaleString());
 
                             }
                             savedDueDate = currentDueDate;
                         } else {
                             showPopup('Nothing updated. No date found in message.', 'red');
-                            console.log("extractDate: Success. ", new Date().toLocaleString());
-                            console.log("showPopup: Success. (Nothing updated. No date found in message.)", new Date().toLocaleString());
+                            console.log("handleUpdateClick: Nothing updated. No date found in message.", new Date().toLocaleString());
 
                         }
                     } else {
@@ -513,7 +497,7 @@
 
             const imgElement = document.querySelector('img.checkboximage[src="/images/nav/ns_x.gif"]');
             if (imgElement) {
-                clickImageCentre(imgElement);
+                clickImageCentre();
             } else {
                 console.log("clickImageCentre: (Error) Image not found.");
             }
@@ -535,19 +519,16 @@
         }
 
         if (priorityType === "Medium") {
-            // Set priority to "Medium" for Dispatch, International, and Collection
             console.log("updatePriority: Setting Medium priority.");
             priorityInput.value = "Medium";
             priorityHidden.value = "MEDIUM";
             priorityIndex.value = "2";
         } else if (priorityType === "High") {
-            // Set priority to "High" for Urgent AM and Taxi
             console.log("updatePriority: Setting High priority.");
             priorityInput.value = "High";
             priorityHidden.value = "HIGH";
             priorityIndex.value = "3";
         } else if (priorityType === "Low") {
-            // Set priority to "High" for Urgent AM and Taxi
             console.log("updatePriority: Setting Low priority.");
             priorityInput.value = "Low";
             priorityHidden.value = "LOW";
@@ -591,7 +572,6 @@
         let mainButton = document.createElement("button");
         mainButton.type = "button";
         mainButton.innerText = name;
-        mainButton.innerText = name;
         mainButton.style.padding = "8px 20px";
         mainButton.style.fontSize = "14px";
         mainButton.style.minWidth = "140px";
@@ -622,6 +602,17 @@
             const isCurrentlyVisible = optionContainer.style.display === "flex";
             optionContainer.style.display = isCurrentlyVisible ? "none" : "flex";
         };
+
+        // Close the dropdown when the mouse leaves (short delay so it isn't twitchy)
+        let closeTimer = null;
+        mainButton.addEventListener('mouseleave', () => {
+            closeTimer = setTimeout(() => {
+                optionContainer.style.display = "none";
+            }, 300);
+        });
+        mainButton.addEventListener('mouseenter', () => {
+            clearTimeout(closeTimer);
+        });
 
         // 5. Add Options
         Object.keys(options).forEach(key => {
@@ -657,34 +648,6 @@
             groupContainer.appendChild(mainButton);
         }
     }
-
-    // Function to lighten a given color by a percentage
-    function lightenColor(color, percent) {
-        let r, g, b;
-
-        // Check if the color is in hex format
-        if (color[0] === '#') {
-            color = color.substring(1);
-            r = parseInt(color.substring(0, 2), 16);
-            g = parseInt(color.substring(2, 4), 16);
-            b = parseInt(color.substring(4, 6), 16);
-        }
-        // If the color is in rgb format
-        else if (color.startsWith('rgb')) {
-            let match = color.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-            r = parseInt(match[1]);
-            g = parseInt(match[2]);
-            b = parseInt(match[3]);
-        }
-
-        // Lighten the color by a percentage
-        r = Math.min(255, Math.floor(r + (255 - r) * percent));
-        g = Math.min(255, Math.floor(g + (255 - g) * percent));
-        b = Math.min(255, Math.floor(b + (255 - b) * percent));
-
-        return `rgb(${r}, ${g}, ${b})`;
-    }
-
 
     // Function to show popup messages
     function showPopup(message, color, borderRadius="5px") {
@@ -726,7 +689,7 @@
             popup.style.opacity = '1';
         }, 0);
 
-        // After 3 seconds, fade it out and then remove it
+        // After 1.5 seconds, fade it out and then remove it
         setTimeout(() => {
             popup.style.opacity = '0';  // Start fade out
             setTimeout(() => {
@@ -735,5 +698,4 @@
         }, 1500);  // Popup is visible for 1.5 seconds
     }
 
-    // Ensure that the script executes on page load
 })();
