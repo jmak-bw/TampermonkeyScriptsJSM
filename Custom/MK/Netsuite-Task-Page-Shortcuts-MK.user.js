@@ -45,7 +45,7 @@
         "No stock": { message: "Hi Matt,\n\nCould you please raise an order for more off [PT No.]. To increase the stock level for this order.\n\nThank you!", title: " – PO to be raised – Increase stock level", priority: "Medium" },
         "PO": { message: "Hi Matt,\n\nCould you please raise a PO for the below item(s).\n\n\n\nThank you!", title: " – PO to be raised", priority: "High" },
         "ETA": { message: "Hi Matt,\n\nWould you be able to provide an ETA for the below items please.\nThe client is chasing us. \n\n\n\n\nThank you!", title: " – ETA delivery", priority: "High" },
-         "System Fulfilment": { message: "Hi Matt/Nicola,\n\nPlease could you manually fufill the items below, as they have been missed/went direct to site.\n\nThank you!", title: " – System Fulfilment", priority: "Low" },
+         "System Fulfilment": { message: "Hi Matt/Nicola,\n\nPlease could you manually fufill the items below, as they have been missed/went direct to site.\n\nThank you!", title: " – System Fulfilment", priority: "Low",  assignedDisplay.value = "Nicola Gowler" },
     };
 
     function updateFields(type, messageData) {
